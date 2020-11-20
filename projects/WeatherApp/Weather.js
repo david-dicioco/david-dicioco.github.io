@@ -22,9 +22,9 @@ function weatherForecast() {
 	var dayCount = 5;
 	var city = document.getElementById("city").value;
 	
-	var urlWeather = 'http://api.openweathermap.org/data/2.5/weather?q=' + city + '&units=celsius&APPID=f61f1cffcc551cd5ba127f1246e4c6da';
+	var urlWeather = 'https://api.openweathermap.org/data/2.5/weather?q=' + city + '&units=celsius&APPID=f61f1cffcc551cd5ba127f1246e4c6da';
 	//units default to metric
-	var urlForecast = 'http://api.openweathermap.org/data/2.5/forecast/daily?APPID=f61f1cffcc551cd5ba127f1246e4c6da&q=' + city + '&units=metric&cnt=5';
+	var urlForecast = 'https://api.openweathermap.org/data/2.5/forecast/daily?APPID=f61f1cffcc551cd5ba127f1246e4c6da&q=' + city + '&units=metric&cnt=5';
 
 	var jsonData = JSON.parse(Get(urlWeather));
 	var jsonDataForecast = JSON.parse(Get(urlForecast));
