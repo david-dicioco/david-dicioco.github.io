@@ -1,0 +1,32 @@
+table, th, td {
+    border: 3px solid white;
+    border-collapse: collapse;
+}
+th, td, p {
+    text-align: center;
+}
+
+body {
+    background-color: #afafff;
+}
+
+#forecastTable {
+	display: none;
+	text-align: center;
+}
+
+#search {
+	text-align: center;
+}
+
+#day1 {
+	background-color: #e2e2e2;
+}
+
+#table {
+	background-color: white;
+}
+
+#currenttemp {
+	font-size: 10;
+}
