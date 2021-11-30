@@ -26,7 +26,7 @@
 			</br>
 			
 			
-			<h2 class="section-title"><u>By following this tutorial you will to gain knowledge in the following:</u></h2>
+			<h2 class="section-title">By following this tutorial you'll be able to gain knowledge in the following:</h2>
 
 			<div class="list-card">
 				<div>
@@ -46,10 +46,19 @@
 					<h3>1) Create a free Azure subscription</h3>
 					<h3>2) Create a Virtual Machine</h3>
 					<h3>3) Network Security Groups</h3>
+					<h3>4) Enable gathering VM logs in Security Center</h3>
+					<h3>5)	Setup Azure Sentinel</h3>
+					<h3>6)	Log into VM with Remote Desktop</h3>
+					<h3>7)	Turn off Windows Firewall on the VM</h3>
+					<h3>8)	Create custom log in LAW to bring in our custom log with geodata</h3>
+					<h3>9)	Create custom fields/extract fields from RawData custom log</h3>
+					<h3>10)	Setup a Map in Sentinel (using Latitude and Longitude)</h3>
+					<h3>11)	Waiting for attacks from the internet</h3>
+					<h3>12) Final Thoughts</h3>
 				</div>
 			</div>	
 	
-			<h2 class="section-title"><u>0) Prerequisites</u></h2>
+			<h2 class="section-title1"><u>0) Prerequisites</u></h2>
 			<h1 class="lead1">i.	PowerShell Script for the Lab: </h1>
 			<h1 class="lead1">ii.	Azure Trial: https://azure.microsoft.com/en-us/free/</h1>
 			<h1 class="lead1">iii.	Sentinel Map Query: </h1>
@@ -57,19 +66,429 @@
 			</br>
 			</br>
 					
-			<h2 class="section-title"><u>1) Create a free Azure subscription</u></h2>
+			<h2 class="section-title1"><u>1) Create a free Azure subscription</u></h2>
 			<h1 class="lead1">i.	First start by setting up a free Azure account (https://azure.microsoft.com/en-us/free/). A $200 Azure credit will be assigned to your account for up to 30 days.</h1>
 
 			</br>
 			</br>
-			<img src="images/AzureSignUp.png" alt="Map with attacks">
+			<img src="images/AzureSignUp1.png" alt="AzureSignUp1">
 			</br>
 			</br>
 			</br>
 			
-			<h2 class="section-title"><u>2)	Create a Virtual Machine</u></h2>
+			<h2 class="section-title1"><u>2)	Create a Virtual Machine</u></h2>
 			<h1 class="lead1">i.	This is the machine that will be exposed on the internet. To create one, open -> https://portal.azure.com/#home and input “Virtual machines” and select it on the search bar.</h1>
 
+			</br>
+			</br>
+			<img src="images/SearchVM.png" alt="SearchVM">
+			</br>
+			</br>
+			</br>
+		
+			<h1 class="lead1">ii.	Click on the “Create” button on the top right and select “Virtual machine”.</h1>
+			
+			</br>
+			</br>
+			<img src="images/CreateVM.png" alt="CreateVM">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">iii.	In the “Create a virtual machine” screen, input the following info on the “Basics” tab:</h1>
+			<h1 class="lead1">
+			<u>Instance details</u>
+			</br>
+			Virtual machine name: honeypot1-vm</br>
+			Leave everything as default</br>
+			</br>
+			<u>Administrator account</u>
+			</br>
+			Username: davidadmin (You can use your name + admin)</br>
+			Password: Password123! (You can input any password you wish. This will be used to log into the virtual machine)</br></br>
+			
+			<u>Licensing</u>
+			</br>
+			Check the box (Windows 10 license with multi-tenant hosting rights)</br>
+			iv.	Click on the “Next: Disks” button</br>
+			v.	On the “Disks” tab, click on the “Next: Networking” button</br>
+			vi.	On the “Networking” tab -></br></br>
+			
+			<u>Network Interface</u></br>
+			NIC network security group: Click on the “Advanced” toggle</br>
+			Configure network security group: Click on the “Create new” button</br></br>
+			In the “Create network security group” screen remove the default “Inbound rules”</br></br>
+			Click on “Add an inbound rule” and input the following. Click on the “Add” button. This will allow all traffic from the internet to enter our VM.</br>
+			</br>
+			Destination port ranges: *</br>
+			Priority: 100</br>
+			Name: DANGER_ANY_IN
+			</h1>
+			<h1 class="lead1">vii. Click on “Review and create” and you will see the image below:</h1>
+			
+			</br>
+			</br>
+			<img src="images/ReviewCreateVM.png" alt="ReviewCreateVM">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">Click “Create”. We want to make our VM discoverable by any means necessary, whether it be PCP pings, SYN scans, etc. For this tutorial we will measure by failed RDP login attempts.
+			</br>
+			</br>
+			Once deployment of the VM is completed it will look like this:
+			</h1>
+			
+			</br>
+			</br>
+			<img src="images/VMDeploymentComplete.png" alt="VMDeploymentComplete">
+			</br>
+			</br>
+			</br>
+			
+			<h2 class="section-title1"><u>3)	Create Log Analytics Workspace</u></h2>
+			<h1 class="lead1">The purpose of creating a Log Analytics workspace is to ingest logs from the VM. The window events logs from the VM will be ingested to the workspace and 
+			it will be converted to custom logs which will contain geographic information. This geographic information allows us to determine the location of where the attacks are coming from. 
+			Also, our SIEM (Azure sentinel) will connect to this workspace to be able to display the attacks through a map</h1>
+
+			<h1 class="lead1">i.	Search for and select “Log Analytics workspaces” in the Search bar</h1>
+
+			</br>
+			</br>
+			<img src="images/SearchLAW.png" alt="SearchLAW">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">ii.	On the “Create Log Analytics Workspace” screen, click on the “Create” button 	</br></br>
+			iii.	Input the following: 	</br>
+			Resource group: honeypot1-vm_group (Resource group name created from -> 2) Create a Virtual Machine)	</br>
+			Name: law-honeypot1 	</br></br>
+			iv.	Click on “Review + Create” button, and click on the “Create” button	</br>
+			</h1>
+			
+			</br>
+			</br>
+			<img src="images/CreateLAW.png" alt="CreateLAW">
+			</br>
+			</br>
+			</br>
+
+			<h2 class="section-title1"><u>4)	Enable gathering VM logs in Security Center</u></h2>
+			<h1 class="lead1">We will enable the ability to gather logs from the VM into the log analytics workspace</h1>
+
+			<h1 class="lead1">i.	Search for and select “Microsoft Defender for Cloud” in the Search bar</h1>
+			
+			</br>
+			</br>
+			<img src="images/SearchDefender.png" alt="SearchDefender">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">ii.	On the “Microsoft Defender for Cloud”, on bottom left side, click on “Environment settings” </br></br>
+
+			iii.	Expand all the options under “Azure” and select the Log Analytics you just made -> “law-honeypot1” </br></br>
+
+			iv.	Click on “Enable all Microsoft Defender for Cloud plans” and toggle “SQL servers on machines” to Off. Click “Save” 
+			</h1>
+			
+			</br>
+			</br>
+			<img src="images/DefenderPlansSettings.png" alt="DefenderPlansSettings">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">v.	On the left-hand side, click on the “Data collection” tab and toggle to “All Events”. Click “Save” </br></br>
+
+			vi.	Go back to the “Log Analytics Workspace”. We will now connect it to the VM. Click on your workspace, “law-honeypot1” </br></br>
+
+			vii.	On the left-hand side, scroll down and click on “Virtual machines” </br></br>
+
+			viii.	Click on the VM, “honeypot1-vm”
+			</h1>
+			
+			</br>
+			</br>
+			<img src="images/VMSelectHoneyPot.png" alt="VMSelectHoneyPot">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">vix.	Click on “Connect” </h1>
+			
+			</br>
+			</br>
+			<img src="images/ConnectHoneyPot.png" alt="ConnectHoneyPot">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">x.	After its finished it should look like the following: </h1>
+			
+			</br>
+			</br>
+			<img src="images/ConnectedHoneyPot.png" alt="ConnectedHoneyPot">
+			</br>
+			</br>
+			</br>
+			
+			<h2 class="section-title1"><u>5)	Setup Azure Sentinel</u></h2>
+			<h1 class="lead1">This is our SIEM we will use to visualize the attack data.</h1>
+
+			<h1 class="lead1">i.	Search for and select “Microsoft Sentinel” in the Search bar </br></br>
+			ii.	Click on “Create” and select the log analytics workspace we created, “law-honeypot1”
+			</h1>
+			
+			</br>
+			
+			<h2 class="section-title1"><u>6)	Log into VM with Remote Desktop</u></h2>
+			<h1 class="lead1">i.	Search for and select “Virtual machines” in the Search bar. Select the VM, “honeypot1-vm” </br></br>
+			ii.	Copy the “Public IP address”
+			</h1>
+			
+			</br>
+			</br>
+			<img src="images/CopyIP.png" alt="CopyIP">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">iii.	Click your Start Menu and type and open “Remote Desktop Connection”. Input the IP address in the “Computer” field and click on “Connect” </br></br>
+
+			iv.	Type in an incorrect username and password and click “OK”. We want to first log a failed login attempt in the “Event Viewer”. Next, type in the correct username (davidadmin) and password (Password123!) you previously created
+
+			</h1>
+			
+			</br>
+			</br>
+			<img src="images/LoginRDC.png" alt="LoginRDC">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">v.	Accept the certification warning. The VM will now begin to open </br></br>
+			vi.	Toggle off all the Privacy settings and click on “Accept” </br></br>
+			vii.	Click on “Microsoft Edge” and complete setting it up </br></br>
+			viii.	Click on the Start Menu in the VM and type and select “Event Viewer” </br></br>
+			ix.	Navigate to “Windows Logs” -> “Security”. These are all the security events on this VM. We will be focusing on Event ID: 4625 </br></br>
+			We will be gathering all login failures that try to login to the VM. Doubling click this record will display Network info regarding what Workstation and its Source Network Address that tried logging in. With the Source Network Addresses/IP addresses, we can determine the location of the users attempting to log in. Programmatically we will use an API geolocation (https://ipgeolocation.io/) which will return location information back to us. Using this info, will then create our own custom log and send it to our log analytics workspace in Azure and use Sentinel to read the longitude and latitude to plot them out to a map.
+
+			</h1>
+			
+			</br>
+			</br>
+			<img src="images/EventViewer.png" alt="EventViewer">
+			</br>
+			</br>
+			</br>
+			
+			</br>
+			</br>
+			<img src="images/EventViewerIPProperties.png" alt="EventViewerIPProperties">
+			</br>
+			</br>
+			</br>
+			
+			</br>
+			</br>
+			<img src="images/GeolocationWebsite.png" alt="GeolocationWebsite">
+			</br>
+			</br>
+			</br>
+			
+			<h2 class="section-title1"><u>7)	Turn off Windows Firewall on the VM</u></h2>
+			<h1 class="lead1">i.	Next, we will turn off the firewall off on the VM so it can respond to ICMP echo requests so people can discover it on the internet faster. In the VM’s start menu, type in and select “wf.msc” </br></br>
+			ii.	Click on “Windows Defender Firewall Properties”.  </br>
+			-	On the “Domain Profile” tab, set “Firewall state” to “Off” </br>
+			-	On the “Private Profile” tab, set “Firewall state” to “Off” </br>
+			-	On the “Public Profile” tab, set “Firewall state” to “Off” </br>
+			Click on “Apply” and “OK” </br></br>
+			iii.	Close “wf.msc” application and the “Event Viewer” </br></br>
+			iv.	On “Microsoft Edge” open this link, https://github.com/joshmadakor1/Sentinel-Lab/blob/main/Custom_Security_Log_Exporter.ps1, and download the PowerShell script </br></br>
+			v.	In the VM’s start menu, type in and select “Windows Powershell ISE”. On the top left, click on “New Script” and paste the script. Save it on the Desktop with the name, “Log_Exporter” </br></br>
+
+			</h1>
+			
+			</br>
+			<img src="images/PSE_Script.png" alt="PSE_Script">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">vi.	Navigate to: https://ipgeolocation.io/ , and create a new account. Once that is completed retrieve the API_KEY and replace with the one in the script </br></br>
+			vii.	In, “Windows Powershell ISE”, click on the “Run” button. Essentially, the custom script will continuously keeps checking the “Event Viewer” Security logs, checks who failed to log in, and gets their IP address and creates a new log file </br></br>
+
+			The purple records below indicate failed log ins from the “Event Viewer”. It will then send the IP addresses to the Geolocation API and creates a “failed_rdp” file in “C:\ProgramData\”
+			</h1>
+			
+			</br>
+			<img src="images/FailedLogs.png" alt="FailedLogs">
+			</br>
+			</br>
+			</br>
+			
+			<h2 class="section-title1"><u>8)	Create custom log in Log Analytics Workspace to bring in our custom log with geodata</u></h2>
+			<h1 class="lead1">i.	In Azure, search for and select “Log Analytics Workspace” in the Search bar. Select the workspace, “law-honeypot1” </br></br>
+			ii.	Click on “Custom Logs” and click on “Add custom logs” </br></br>
+			iii.	Go back to the VM and under “C:\ProgramData\” copy the contents of the “failed_rdp” file. In your local computer, open “Notepad” and paste the contents. Save it to your “Desktop” and name it, “failed_rdp.log” (Save type as “All Files”) </br></br>
+			iv.	In Azure, upload “failed_rdp.log”. This will be used to train Log Analytics on what to look for in the log file </br></br>
+			v.	Click on “Next” and on “Record delimiter” click on “Next” </br></br>
+			vi.	On “Collection Paths”, select type “Windows” and input “C:\ProgramData\failed_rdp.log”. Click on “Next” </br>
+			</h1>
+			
+			</br>
+			<img src="images/CreateCustomLog.png" alt="CreateCustomLog">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">vii.	On “Details”, input “FAILED_RDP_GEO” in the “Custom log name” field. Click on “Next” </br></br>
+			viii.	Click on “Create” </br></br>
+			ix.	It will take a while for the log analytics workspace and the VM to sync up and bring the logs in (15-30 min). To verify the sync is complete, click on “Logs”, close the “Query” pop-up and type in “FAILED_RDP_WITH_GEO_CL” (remove any additional characters after it). Click on the “Run” button. If logs are displayed, the sync is complete </br>
+			</h1>
+			
+			</br>
+			<img src="images/LAWLogs.png" alt="LAWLogs">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">The “RawData” column contains a whole line from the “failed_rdp” file in the VM. Next we will extract fields from the “Raw Data” column so we can create their own field (Ex. Fields for latitude, longitude, etc.)</h1>
+			
+			</br>
+			
+			<h2 class="section-title1"><u>9)	Create custom fields/extract fields from RawData custom log</u></h2>
+			<h1 class="lead1">i.	Expand one of the logs and click on “Extract fields from ….” </br>
+			</h1>
+			
+			</br>
+			<img src="images/ExtractFrom.png" alt="ExtractFrom">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">ii.	Highlight the value of “Latitude”. In “Field Title”, input, “latitude1”, and for “Field Type” select “Numeric”</br>
+			</h1>
+			
+			</br>
+			<img src="images/SetCustomField.png" alt="SetCustomField">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">iii.	Under “Search Results”, verify all the latitude fields are getting its latitude values. If so, click on the “Save Extraction” button</br>
+			</h1>
+			
+			</br>
+			<img src="images/SetLatitudeField.png" alt="SetLatitudeField">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">The sample data allows us to train the extract process.</br></br>
+			iv.	On the same log and click on “Extract fields from ….” and do the same for longitude. If there are any highlight issues like the one below:</br>
+			</h1>
+			
+			</br>
+			<img src="images/SetLongitudeField.png" alt="SetLongitudeField">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">
+			Click on the “Edit” button and click “Modify this highlight”. Highlight the correct value and click “Extract”. Do that for every record that is highlighting an incorrect value. </br></br>
+			Once all records under “Search Results” are verified, click on the “Save Extraction” button </br></br>
+			v.	Repeat the process for every field in “RawData”.  </br></br>
+			Input/Select the following for each fields </br></br>
+
+			<u>destinationhost</u> </br>
+			Field Title: destinationhost </br>
+			Field Type: Text </br></br>
+
+			<u>username</u> </br>
+			Field Title: destinationhost </br>
+			Field Type: Text </br></br>
+
+			<u>sourcehost</u> </br>
+			Field Title: sourcehost </br>
+			Field Type: Text </br></br>
+
+			<u>state</u> </br>
+			Field Title: state </br>
+			Field Type: Text </br></br>
+
+			<u>country</u> </br>
+			Field Title: country </br>
+			Field Type: Text </br></br>
+
+			<u>label</u> </br>
+			Field Title: label </br>
+			Field Type: Text </br></br>
+
+			<u>timestamp</u> </br>
+			Field Title: timestamp </br>
+			Field Type: Date/Time </br></br>
+			The sample records you have, the more accurate the extract process will be. </br></br>
+			vi.	To verify the logs are parsed out correctly, you can do another failed login attempt on your local computer. Running the query again shows the logs are parsed out correctly </br>
+
+			</h1>
+			
+			</br>
+			<img src="images/NewFailedLogs.png" alt="NewFailedLogs">
+			</br>
+			</br>
+			</br>
+			
+			<h2 class="section-title1"><u>10)	Setup a Map in Sentinel (using Latitude and Longitude)</u></h2>
+			<h1 class="lead1">We will now setup a map within Sentinel which is currently linked to FAILED_RDP_WITH_GEO_CL </br></br>
+			i.	In Azure, search for and select “Microsoft Sentinel” in the Search bar. Select the workspace, “law-honeypot1” </br></br>
+			ii.	Click on “Workbooks” and click on “Add workbook” </br></br>
+			iii.	Click on “Edit” and remove the two default widgets </br></br>
+			iv.	Click on “Add” -> “Add query”. Paste the following query: </br>
+			FAILED_RDP_WITH_GEO_CL | summarize event_count=count() by sourcehost_CF, latitude_CF, longitude_CF, country_CF, label_CF, destinationhost_CF </br>
+			| where destinationhost_CF != "samplehost" </br>
+			| where sourcehost_CF != "" </br></br>
+
+			v.	Set “Visualization” to “Map”, and “Map Size” to “Full” </br></br>
+			vi.	In the “Map Settings” set the fields to the following: </br>
+			“Latitude”: latitude_CF </br>
+			“Longitude”: longitude_CF </br>
+			“Size by”: event_count </br>
+			“Metric Label”: label_CF </br></br>
+
+			vii.	Click on “Done Editing”. Set “Auto refresh” to “5 minutes”
+			 </br></br>
+			</h1>
+			
+			<h2 class="section-title1"><u>11)	Waiting for attacks from the internet</u></h2>
+			<h1 class="lead1">By waiting for a couple hours (12-24), the map with automatically refresh every 5 minutes and display when a user from the internet tried and failed to log in. </br></br>
+			In this example, I ran it overnight and the map displayed the following</br></br>
+			</h1>
+			
+			</br>
+			<img src="images/RDPMap.png" alt="RDPMap">
+			</br>
+			</br>
+			</br>
+			
+			<h1 class="lead1">Substantial amounts of activity were logged for both Vietnam (5000+) and the United States (1000+) </br></br>
+			IMPORTANT NOTE: Delete the resource group in Azure once you have completed this tutorial! Otherwise, they will consume your free $200 Azure credit and potentially cost money if the 30 days from your free trial is expired. </br></br>
+			</h1>
+			
+			<h2 class="section-title1"><u>12) Final Thoughts</u></h2>
+			<h1 class="lead1">By going through this tutorial its evident that as soon as anything is put up on the internet (for this example -> an open VM), people from around the world will attempt to access it. You become a target of opportunity if anything is open. Secondly, 
+			by going through the logs of the VM, it was clear that you should avoid using the username of “Administrator”. The username was found to be one of the most guessed. By disabling common usernames, you can avoid this risk. Password strength was also found to be important considering the 
+			large amount of log in attempts made overnight (less than 24 hours). By having a strong password, it adds another layer of defense.</br>
+			</h1>
+			
+			</br>
+			<img src="images/AdminVun.png" alt="AdminVun">
+			</br>
+			</br>
+			</br>
+			
 	</div>
 
 <!-- Skills and intrest section -->
