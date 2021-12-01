@@ -27,6 +27,7 @@ function weatherForecast() {
 	var urlForecast = 'https://api.openweathermap.org/data/2.5/forecast/daily?APPID=f61f1cffcc551cd5ba127f1246e4c6da&q=' + city + '&units=metric&cnt=5';
 
 	var jsonData = JSON.parse(Get(urlWeather));
+		
 	var jsonDataForecast = JSON.parse(Get(urlForecast));
 
 	var date = new Date();
@@ -39,9 +40,9 @@ function weatherForecast() {
 	windSpeed = Math.round(jsonData.wind.speed * (18/5));
 	//converts kelvin to celsius
 	temperature = Math.round(kelvin - 273.15);
-
+	
 	//determine the weather icon
-	console.log("weather icon: " + jsonData.weather[0].icon);
+	//console.log("weather icon: " + jsonData.weather[0].icon);
 
 	document.getElementById("forecast").innerHTML = jsonData.name + ", " + jsonDataForecast.city.country + "<br>"
 	+ "<p id='currenttempurature'>" + temperature + " " + cUnit + "</p>" + jsonData.weather[0].description + "<br>" 
@@ -118,15 +119,27 @@ function calculateCelsius() {
 }
 
 function validateText() {
+	
+	var urlWeather = 'https://api.openweathermap.org/data/2.5/weather?q=' + document.getElementById("city").value + '&units=celsius&APPID=f61f1cffcc551cd5ba127f1246e4c6da';
+	var jsonData = JSON.parse(Get(urlWeather));
+	
+	if (!/^[a-zA-Z]*$/g.test(document.getElementById("city").value)) {
+        alert("Invalid characters");
+        document.getElementById("city").focus();
+        return false;
+    }
+	
     if (document.getElementById("city").value == "") {
         alert("Enter a city");
         document.getElementById("city").focus();
         return false;
     }
-    if (!/^[a-zA-Z]*$/g.test(document.getElementById("city").value)) {
-        alert("Invalid characters");
+	
+	if (jsonData.message == "city not found") {
+		//console.log("Message from Weather API: " + jsonData.message);
+        alert("City not found");
         document.getElementById("city").focus();
-        return false;
+		return false;
     } else {
 		weatherForecast();
 	}
