@@ -44,23 +44,23 @@
 			<!-- Make each of the them clickable -->
 			<div class="list-card">
 				<div>
-					<h3>0) Prerequisites</h3>
-					<h3>1) Create a free Azure subscription</h3>
-					<h3>2) Create a Virtual Machine</h3>
-					<h3>3) Network Security Groups</h3>
-					<h3>4) Enable gathering VM logs in Security Center</h3>
-					<h3>5)	Setup Azure Sentinel</h3>
-					<h3>6)	Log into VM with Remote Desktop</h3>
-					<h3>7)	Turn off Windows Firewall on the VM</h3>
-					<h3>8)	Create custom log in LAW to bring in our custom log with geodata</h3>
-					<h3>9)	Create custom fields/extract fields from RawData custom log</h3>
-					<h3>10)	Setup a Map in Sentinel (using Latitude and Longitude)</h3>
-					<h3>11)	Waiting for attacks from the internet</h3>
-					<h3>12) Final Thoughts</h3>
+					<a href="#Step0">0) Prerequisites</a> </br></br>
+					<a href="#Step1">1) Create a free Azure subscription</a> </br></br>
+					<a href="#Step2">2) Create a Virtual Machine</a> </br></br>
+					<a href="#Step3">3) Create Log Analytics Workspace</a> </br></br>
+					<a href="#Step4">4) Enable gathering VM logs in Security Center</a> </br></br>
+					<a href="#Step5">5)	Setup Azure Sentinel</a> </br></br>
+					<a href="#Step6">6)	Log into VM with Remote Desktop</a> </br></br>
+					<a href="#Step7">7)	Turn off Windows Firewall on the VM</a> </br></br>
+					<a href="#Step8">8)	Create custom log in LAW to bring in our custom log with geodata</a> </br></br>
+					<a href="#Step9">9)	Create custom fields/extract fields from RawData custom log</a> </br></br>
+					<a href="#Step10">10)	Setup a Map in Sentinel (using Latitude and Longitude)</a> </br></br>
+					<a href="#Step11">11)	Waiting for attacks from the internet</a> </br></br>
+					<a href="#Step12">12) Final Thoughts</a> </br></br>
 				</div>
 			</div>	
 	
-			<h2 class="section-title1"><u>0) Prerequisites</u></h2>
+			<h2 class="section-title1" id="Step0"><u>0) Prerequisites</u></h2>
 			<h1 class="lead1">i.	PowerShell Script for the Lab: <a href="https://github.com/david-dicioco/SIEM_Azure_Scripts/blob/main/Custom_Security_Log_Exporter.ps1">Github link</a></h1>
 			<h1 class="lead1">ii.	Azure Trial:  <a href="https://azure.microsoft.com/en-us/free/">https://azure.microsoft.com/en-us/free/</a></h1>
 			<h1 class="lead1">iii.	Sentinel Map Query: <a href="https://github.com/david-dicioco/SIEM_Azure_Scripts/blob/main/Sentinel_Map_Query.txt">Github link</a></h1>
@@ -68,7 +68,7 @@
 			</br>
 			</br>
 					
-			<h2 class="section-title1"><u>1) Create a free Azure subscription</u></h2>
+			<h2 class="section-title1" id="Step1"><u>1) Create a free Azure subscription</u></h2>
 			<h1 class="lead1">i.	First start by setting up a free Azure account (https://azure.microsoft.com/en-us/free/). A $200 Azure credit will be assigned to your account for up to 30 days.</h1>
 
 			</br>
@@ -78,7 +78,7 @@
 			</br>
 			</br>
 			
-			<h2 class="section-title1"><u>2)	Create a Virtual Machine</u></h2>
+			<h2 class="section-title1" id="Step2"><u>2)	Create a Virtual Machine</u></h2>
 			<h1 class="lead1">i.	This is the machine that will be exposed on the internet. To create one, open -> https://portal.azure.com/#home and input “Virtual machines” and select it on the search bar.</h1>
 
 			</br>
@@ -148,7 +148,7 @@
 			</br>
 			</br>
 			
-			<h2 class="section-title1"><u>3)	Create Log Analytics Workspace</u></h2>
+			<h2 class="section-title1" id="Step3"><u>3)	Create Log Analytics Workspace</u></h2>
 			<h1 class="lead1">The purpose of creating a Log Analytics workspace is to ingest logs from the VM. The window events logs from the VM will be ingested to the workspace and 
 			it will be converted to custom logs which will contain geographic information. This geographic information allows us to determine the location of where the attacks are coming from. 
 			Also, our SIEM (Azure sentinel) will connect to this workspace to be able to display the attacks through a map</h1>
@@ -176,7 +176,7 @@
 			</br>
 			</br>
 
-			<h2 class="section-title1"><u>4)	Enable gathering VM logs in Security Center</u></h2>
+			<h2 class="section-title1" id="Step4"><u>4)	Enable gathering VM logs in Security Center</u></h2>
 			<h1 class="lead1">We will enable the ability to gather logs from the VM into the log analytics workspace</h1>
 
 			<h1 class="lead1">i.	Search for and select “Microsoft Defender for Cloud” in the Search bar</h1>
@@ -236,7 +236,7 @@
 			</br>
 			</br>
 			
-			<h2 class="section-title1"><u>5)	Setup Azure Sentinel</u></h2>
+			<h2 class="section-title1" id="Step5"><u>5)	Setup Azure Sentinel</u></h2>
 			<h1 class="lead1">This is our SIEM we will use to visualize the attack data.</h1>
 
 			<h1 class="lead1">i.	Search for and select “Microsoft Sentinel” in the Search bar </br></br>
@@ -245,7 +245,7 @@
 			
 			</br>
 			
-			<h2 class="section-title1"><u>6)	Log into VM with Remote Desktop</u></h2>
+			<h2 class="section-title1" id="Step6"><u>6)	Log into VM with Remote Desktop</u></h2>
 			<h1 class="lead1">i.	Search for and select “Virtual machines” in the Search bar. Select the VM, “honeypot1-vm” </br></br>
 			ii.	Copy the “Public IP address”
 			</h1>
@@ -300,7 +300,7 @@
 			</br>
 			</br>
 			
-			<h2 class="section-title1"><u>7)	Turn off Windows Firewall on the VM</u></h2>
+			<h2 class="section-title1" id="Step7"><u>7)	Turn off Windows Firewall on the VM</u></h2>
 			<h1 class="lead1">i.	Next, we will turn off the firewall off on the VM so it can respond to ICMP echo requests so people can discover it on the internet faster. In the VM’s start menu, type in and select “wf.msc” </br></br>
 			ii.	Click on “Windows Defender Firewall Properties”.  </br>
 			-	On the “Domain Profile” tab, set “Firewall state” to “Off” </br>
@@ -331,7 +331,7 @@
 			</br>
 			</br>
 			
-			<h2 class="section-title1"><u>8)	Create custom log in Log Analytics Workspace to bring in our custom log with geodata</u></h2>
+			<h2 class="section-title1" id="Step8"><u>8)	Create custom log in Log Analytics Workspace to bring in our custom log with geodata</u></h2>
 			<h1 class="lead1">i.	In Azure, search for and select “Log Analytics Workspace” in the Search bar. Select the workspace, “law-honeypot1” </br></br>
 			ii.	Click on “Custom Logs” and click on “Add custom logs” </br></br>
 			iii.	Go back to the VM and under “C:\ProgramData\” copy the contents of the “failed_rdp” file. In your local computer, open “Notepad” and paste the contents. Save it to your “Desktop” and name it, “failed_rdp.log” (Save type as “All Files”) </br></br>
@@ -361,7 +361,7 @@
 			
 			</br>
 			
-			<h2 class="section-title1"><u>9)	Create custom fields/extract fields from RawData custom log</u></h2>
+			<h2 class="section-title1" id="Step9"><u>9)	Create custom fields/extract fields from RawData custom log</u></h2>
 			<h1 class="lead1">i.	Expand one of the logs and click on “Extract fields from ….” </br>
 			</h1>
 			
@@ -443,7 +443,7 @@
 			</br>
 			</br>
 			
-			<h2 class="section-title1"><u>10)	Setup a Map in Sentinel (using Latitude and Longitude)</u></h2>
+			<h2 class="section-title1" id="Step10"><u>10)	Setup a Map in Sentinel (using Latitude and Longitude)</u></h2>
 			<h1 class="lead1">We will now setup a map within Sentinel which is currently linked to FAILED_RDP_WITH_GEO_CL </br></br>
 			i.	In Azure, search for and select “Microsoft Sentinel” in the Search bar. Select the workspace, “law-honeypot1” </br></br>
 			ii.	Click on “Workbooks” and click on “Add workbook” </br></br>
@@ -464,7 +464,7 @@
 			 </br></br>
 			</h1>
 			
-			<h2 class="section-title1"><u>11)	Waiting for attacks from the internet</u></h2>
+			<h2 class="section-title1" id="Step11"><u>11)	Waiting for attacks from the internet</u></h2>
 			<h1 class="lead1">By waiting for a couple hours (12-24), the map with automatically refresh every 5 minutes and display when a user from the internet tried and failed to log in. </br></br>
 			In this example, I ran it overnight and the map displayed the following</br></br>
 			</h1>
@@ -479,7 +479,7 @@
 			IMPORTANT NOTE: Delete the resource group in Azure once you have completed this tutorial! Otherwise, they will consume your free $200 Azure credit and potentially cost money if the 30 days from your free trial is expired. </br></br>
 			</h1>
 			
-			<h2 class="section-title1"><u>12) Final Thoughts</u></h2>
+			<h2 class="section-title1"id="Step12"><u>12) Final Thoughts</u></h2>
 			<h1 class="lead1">By going through this tutorial its evident that as soon as anything is put up on the internet (for this example -> an open VM), people from around the world will attempt to access it. You become a target of opportunity if anything is open. Secondly, 
 			by going through the logs of the VM, it was clear that you should avoid using the username of “Administrator”. The username was found to be one of the most guessed. By disabling common usernames, you can avoid this risk. Password strength was also found to be important considering the 
 			large amount of log in attempts made overnight (less than 24 hours). By having a strong password, it adds another layer of defense.</br>
