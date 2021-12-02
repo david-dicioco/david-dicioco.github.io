@@ -46,7 +46,7 @@ function weatherForecast() {
 
 	document.getElementById("forecast").innerHTML = jsonData.name + ", " + jsonDataForecast.city.country + "<br>"
 	+ "<p id='currenttempurature'>" + temperature + " " + cUnit + "</p>" + jsonData.weather[0].description + "<br>" 
-	+ "<img src='images/" + jsonData.weather[0].icon + ".png' height='80' width='80'>"
+	+ "<img src='images_Weather/" + jsonData.weather[0].icon + ".png' height='80' width='80'>"
 	+ "<p id='windspeed'> Wind: " + windSpeed + " km/h</p>"
 	+ "<p> Humidity: " + jsonData.main.humidity + "%" + "</p>";
 
@@ -67,7 +67,7 @@ function weatherForecast() {
 		
 		document.getElementById("day" + dayValue).innerHTML = month + "/" + dateValue + "<br>" +
 		jsonDataForecast.list[i].weather[0].description + "<br>" + "<br>" +
-		"<img src='images/" + jsonDataForecast.list[i].weather[0].icon + ".png' height='80' width='80'>" +
+		"<img src='images_Weather/" + jsonDataForecast.list[i].weather[0].icon + ".png' height='80' width='80'>" +
 		"<p id = ForcastTemp" + dayValue + ">" + "Min: " + minTempurature[i] + " " + cUnit +  ", " + "Max: " +
 		maxTempurature[i] + " " + cUnit + "</p>";
 
